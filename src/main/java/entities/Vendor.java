@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class Vendor {
     private Long id;
-    @Setter
     private  String name;
-    @Setter
+    private String serviceCategory;
     private String state;
 }

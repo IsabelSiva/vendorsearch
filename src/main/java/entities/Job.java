@@ -7,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Vendor {
+public class Job {
     private Long id;
-    private  String name;
     private String serviceCategory;
     private String location;
 }

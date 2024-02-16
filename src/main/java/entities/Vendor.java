@@ -12,4 +12,5 @@ public class Vendor {
     private  String name;
     private String serviceCategory;
     private String location;
+    private boolean compliant;
 }

@@ -1,11 +1,11 @@
-package controllers;
+package com.isabelsilva.vendorsearch.controllers;
 
-import entities.Job;
-import entities.Vendor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.isabelsilva.vendorsearch.entities.Job;
+import com.isabelsilva.vendorsearch.entities.Vendor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,39 +13,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@RestController
+@RequestMapping("/api")
+@Log4j2
 public class VendorSearchController {
-    private static List<Vendor> vendors = new ArrayList<>();
-    private static List<Job> jobs = new ArrayList<>();
-
-    static {
-        vendors.add(new Vendor(1L, "Vendor1", "Region1", "ServiceCategory1", true));
-        vendors.add(new Vendor(2L, "Vendor2", "Region2", "ServiceCategory2", false));
-
-        jobs.add(new Job(1L, "ServiceCategory1", "Region1"));
-        jobs.add(new Job(2L, "ServiceCategory2", "Region2"));
-    }
+    private List<Vendor> vendors = new ArrayList<>();
+    private List<Job> jobs = new ArrayList<>();
 
     @GetMapping("/potentialVendors")
-    public List<Vendor> getPotentialVendors(@RequestParam Long jobId) {
+    public ResponseEntity<List<Vendor>> getPotentialVendors(@RequestParam Long jobId) {
         Job job = findJobById(jobId);
         if (job != null) {
-            return filterPotentialVendors(job);
+            List<Vendor> potentialVendors = filterPotentialVendors(job);
+            return ResponseEntity.ok(potentialVendors);
         }
-        return new ArrayList<>();
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/createVendor")
-    public void createVendor(@RequestBody Vendor vendor) {
+    public ResponseEntity<String> createVendor(@RequestBody Vendor vendor) {
+        log.error("uata réu meu cumpadi?");
         vendors.add(vendor);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Vendor created");
     }
 
     @PostMapping("/createJob")
-    public void createJob(@RequestBody Job job) {
+    public ResponseEntity<String> createJob(@RequestBody Job job) {
         jobs.add(job);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Job created");
     }
 
     @GetMapping("/public/vendorStats")
-    public Map<String, Object> getVendorStats(@RequestParam Long jobId) {
+    public ResponseEntity<Map<String, Object>> getVendorStats(@RequestParam Long jobId) {
         Job job = findJobById(jobId);
         if (job != null) {
             int totalVendors = vendors.size();
@@ -57,15 +56,15 @@ public class VendorSearchController {
             stats.put("compliantVendors", compliantVendors);
             stats.put("nonCompliantVendors", nonCompliantVendors);
 
-            return stats;
+            return ResponseEntity.ok(stats);
         }
-        return new HashMap<>();
+        return ResponseEntity.notFound().build();
     }
 
     private List<Vendor> filterPotentialVendors(Job job) {
         return vendors.stream()
                 .filter(vendor -> vendor.getLocation().equals(job.getLocation()) && vendor.getServiceCategory().equals(job.getServiceCategory()))
-                .sorted((v1, v2) -> Boolean.compare(v2.isCompliant(), v1.isCompliant()))
+                .sorted((v1, v2) -> Boolean.compare(v2.isCompliant(), v1.isCompliant())) // compliant vendors first
                 .collect(Collectors.toList());
     }
 

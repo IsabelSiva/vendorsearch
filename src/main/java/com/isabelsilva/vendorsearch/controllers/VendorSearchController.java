@@ -20,14 +20,10 @@ public class VendorSearchController {
     private List<Vendor> vendors = new ArrayList<>();
     private List<Job> jobs = new ArrayList<>();
 
-    @GetMapping("/potentialVendors")
-    public ResponseEntity<List<Vendor>> getPotentialVendors(@RequestParam Long jobId) {
-        Job job = findJobById(jobId);
-        if (job != null) {
-            List<Vendor> potentialVendors = filterPotentialVendors(job);
-            return ResponseEntity.ok(potentialVendors);
-        }
-        return ResponseEntity.notFound().build();
+    @PostMapping("/createJob")
+    public ResponseEntity<String> createJob(@RequestBody Job job) {
+        jobs.add(job);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Job created");
     }
 
     @PostMapping("/createVendor")
@@ -37,10 +33,14 @@ public class VendorSearchController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Vendor created");
     }
 
-    @PostMapping("/createJob")
-    public ResponseEntity<String> createJob(@RequestBody Job job) {
-        jobs.add(job);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Job created");
+    @GetMapping("/potentialVendors")
+    public ResponseEntity<List<Vendor>> getPotentialVendors(@RequestParam Long jobId) {
+        Job job = findJobById(jobId);
+        if (job != null) {
+            List<Vendor> potentialVendors = filterPotentialVendors(job);
+            return ResponseEntity.ok(potentialVendors);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/public/vendorStats")
@@ -64,7 +64,7 @@ public class VendorSearchController {
     private List<Vendor> filterPotentialVendors(Job job) {
         return vendors.stream()
                 .filter(vendor -> vendor.getLocation().equals(job.getLocation()) && vendor.getServiceCategory().equals(job.getServiceCategory()))
-                .sorted((v1, v2) -> Boolean.compare(v2.isCompliant(), v1.isCompliant())) // compliant vendors first
+                .sorted((v1, v2) -> Boolean.compare(v2.isCompliant(), v1.isCompliant()))
                 .collect(Collectors.toList());
     }
 

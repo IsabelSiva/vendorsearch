@@ -46,13 +46,18 @@ public class VendorSearchController {
         return ResponseEntity.ok(jobs);
     }
 
-    @GetMapping("/public/vendorStats")
-    public ResponseEntity<Map<String, Object>> getVendorStats(@RequestParam Long jobId) {
-        Job job = findJobById(jobId);
-        if (job != null) {
-            int totalVendors = vendors.size();
-            int compliantVendors = (int) vendors.stream().filter(Vendor::isCompliant).count();
-            int nonCompliantVendors = totalVendors - compliantVendors;
+    @GetMapping("/amountVendors")
+    public ResponseEntity<Map<String, Object>> getAmountVendors(@RequestParam Long vendorId) {
+        Vendor vendor = findVendorById(vendorId);
+
+        List<Vendor> vendorsWithSameLocation = vendors.stream()
+                .filter(v -> v.getLocation().equals(vendor.getLocation()))
+                .toList();
+
+        if (!vendorsWithSameLocation.isEmpty()) {
+            int totalVendors = vendorsWithSameLocation.size();
+            long compliantVendors = vendorsWithSameLocation.stream().filter(Vendor::isCompliant).count();
+            int nonCompliantVendors = totalVendors - (int) compliantVendors;
 
             Map<String, Object> stats = new HashMap<>();
             stats.put("totalVendors", totalVendors);
@@ -61,7 +66,13 @@ public class VendorSearchController {
 
             return ResponseEntity.ok(stats);
         }
+
         return ResponseEntity.notFound().build();
+    }
+
+
+    private Vendor findVendorById(Long vendorId) {
+        return vendors.stream().filter(job -> job.getId().equals(vendorId)).findFirst().orElse(null);
     }
 
     private List<Vendor> filterPotentialVendors(Job job) {

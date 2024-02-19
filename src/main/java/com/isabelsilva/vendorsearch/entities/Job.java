@@ -9,6 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Job {
     private Long id;
-    private String serviceCategory;
-    private String location;
+    private ServiceCategory serviceCategory;
+    private Location location;
 }

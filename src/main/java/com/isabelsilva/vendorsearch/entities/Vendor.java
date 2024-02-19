@@ -5,14 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @ToString
 public class Vendor {
     private Long id;
-    private  String name;
-    private String serviceCategory;
-    private String location;
+    private List<ServiceCategory> serviceCategories;
+    private Location location;
     private boolean compliant;
 }

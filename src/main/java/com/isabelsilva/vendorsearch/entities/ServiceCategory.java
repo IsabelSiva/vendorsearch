@@ -1,15 +1,13 @@
 package com.isabelsilva.vendorsearch.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
-public class ServiceCategories {
+@EqualsAndHashCode
+public class ServiceCategory {
     private Long id;
     private String name;
 }
